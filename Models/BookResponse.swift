@@ -55,6 +55,6 @@ extension Book {
                                     subjects: ["Domestic fiction","England -- Fiction","Psychological fiction",
                                                "Love stories", "Fucking Porn",
                                                "Married people -- Fiction"],
-                                  formats: ["image/jpeg": "https://example.com/sample2.jpg"]
+                                  formats: ["image/jpeg": "https://m.media-amazon.com/images/I/617lxveUjYL.jpg"]
 )
 }
