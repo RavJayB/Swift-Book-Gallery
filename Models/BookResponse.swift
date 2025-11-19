@@ -18,6 +18,7 @@ struct Book: Codable, Identifiable {
     let summaries: [String]
     let downloadCount: Int
     let subjects: [String]
+    let formats: [String: String]?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -25,6 +26,11 @@ struct Book: Codable, Identifiable {
         case summaries
         case downloadCount = "download_count"
         case subjects
+        case formats
+    }
+    
+    var coverImageURL: String? {
+        formats?["image/jpeg"]
     }
 }
 
@@ -41,7 +47,8 @@ extension Book {
                                   downloadCount: 10,
                                   subjects: ["Domestic fiction","England -- Fiction","Psychological fiction",
                                              "Love stories",
-                                             "Married people -- Fiction"]
+                                             "Married people -- Fiction"],
+                                  formats: ["image/jpeg": "https://example.com/sample.jpg"]
     )
     
     static let sampleBook02 = Book (title: "The Alchemist",
@@ -50,6 +57,7 @@ extension Book {
                                   downloadCount: 50,
                                     subjects: ["Domestic fiction","England -- Fiction","Psychological fiction",
                                                "Love stories",
-                                               "Married people -- Fiction"]
+                                               "Married people -- Fiction"],
+                                  formats: ["image/jpeg": "https://example.com/sample2.jpg"]
 )
 }

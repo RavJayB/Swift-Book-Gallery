@@ -15,6 +15,25 @@ struct BookDetails: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .center, spacing: 16) {
+
+
+                if let coverImageURL = book.coverImageURL,
+                let url = URL(string: coverImageURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image.resizable().scaledToFit()
+                        case .failure(_):
+                            Image(systemName: "book.closed")
+                        case .empty:
+                            ProgressView()
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                    .frame(height: 200)
+                }
+                
                 Text(book.title)
                     .font(.title)
                     .fontWeight(.bold)
