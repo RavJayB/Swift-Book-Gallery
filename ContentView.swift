@@ -32,6 +32,9 @@ struct ContentView: View {
                     await viewModel.fetchBooks()
                 }
                 .searchable(text: $searchText, prompt: "Search books")
+                .onChange(of: searchText) { newValue in
+                    viewModel.search(with: newValue)
+                }
             }
             .tabItem {
                 Label("Browse", systemImage: "book")
