@@ -101,8 +101,8 @@ struct BookDetails: View {
     
     private func toggleFavorite() {
         var favorites = loadFavorites()
-        if let index = favorites.firstIndex(where: { $0.title == book.title }) {
-            favorites.remove(at: index)
+        if isBookFavorite() {
+            favorites.removeAll { $0.title == book.title }
             isFavorite = false
         } else {
             favorites.append(book)

@@ -55,6 +55,20 @@ class BooksViewModel{
             //
         }
     }
+    func search(with text: String) {
+        guard let allBooks = bookResponse?.results else { return }
+        
+        guard !text.isEmpty else {
+            books = allBooks
+            return
+        }
+        
+        let lowercased = text.lowercased()
+        
+        books = allBooks.filter {
+            $0.title.lowercased().contains(lowercased)
+        }
+    }
     
     
 }
