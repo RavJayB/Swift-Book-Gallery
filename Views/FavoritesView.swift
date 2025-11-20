@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavoritesView: View {
-    @State private var viewModel = FavoritesViewModel()
+    @Environment(BooksViewModel.self) private var viewModel
     
     var body: some View {
         Group {
@@ -41,14 +41,14 @@ struct FavoritesView: View {
                             }
                         }
                     }
-                    .onDelete(perform: viewModel.deleteFavorite)
+                    .onDelete(perform: viewModel.removeFavorite)
                 }
                 .listStyle(.insetGrouped)
             }
         }
         .navigationTitle("Favorites")
         .onAppear {
-            viewModel.refresh()
+            viewModel.refreshFavorites()
         }
     }
 }
@@ -56,6 +56,6 @@ struct FavoritesView: View {
 #Preview {
     NavigationStack {
         FavoritesView()
+            .environment(BooksViewModel())
     }
 }
-

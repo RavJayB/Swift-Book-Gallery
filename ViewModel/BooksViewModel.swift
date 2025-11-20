@@ -7,39 +7,43 @@
 
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable
-
-class BooksViewModel{
+class BooksViewModel {
+    private let storage = UserDefaults.standard
+    private let favoritesKey = AppStorageKeys.favoriteBooks
+    
     var appsState: AppStates = .idele
-    var bookResponse : BookResponse?
-    var books : [Book] = []
-    var errorMessage : String?
+    var bookResponse: BookResponse?
+    var books: [Book] = []
+    var errorMessage: String?
+    var favoriteBooks: [Book] = []
+    
+    init() {
+        refreshFavorites()
+    }
     
     func fetchBooks() async {
-        guard appsState != .loading else {return}
+        guard appsState != .loading else { return }
         
         appsState = .loading
         
         let urlString = "https://gutendex.com/books/"
         
         guard let url = URL(string: urlString) else {
-            //handle errors
             errorMessage = APIErrors.invalidURL.errorDescription
             appsState = .failure
-            //
             return
         }
         
         do {
-            let(data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(from: url)
             
             guard let httpResponses = response as? HTTPURLResponse,
-                    (200..<300).contains(httpResponses.statusCode) else {
-                //handle errors
+                  (200..<300).contains(httpResponses.statusCode) else {
                 errorMessage = APIErrors.invalidResponse.errorDescription
                 appsState = .failure
-                //
                 return
             }
             
@@ -48,13 +52,12 @@ class BooksViewModel{
             books = decodeData.results
             appsState = .success
             
-        }catch{
-            //handle errors here
+        } catch {
             errorMessage = APIErrors.unknown.errorDescription
             appsState = .failure
-            //
         }
     }
+    
     func search(with text: String) {
         guard let allBooks = bookResponse?.results else { return }
         
@@ -70,5 +73,38 @@ class BooksViewModel{
         }
     }
     
+    func refreshFavorites() {
+        favoriteBooks = loadFavorites()
+    }
     
+    func toggleFavorite(_ book: Book) {
+        if let index = favoriteBooks.firstIndex(where: { $0.title == book.title }) {
+            favoriteBooks.remove(at: index)
+        } else {
+            favoriteBooks.append(book)
+        }
+        persistFavorites()
+    }
+    
+    func removeFavorite(at offsets: IndexSet) {
+        favoriteBooks.remove(atOffsets: offsets)
+        persistFavorites()
+    }
+    
+    func isFavorite(_ book: Book) -> Bool {
+        favoriteBooks.contains { $0.title == book.title }
+    }
+    
+    private func loadFavorites() -> [Book] {
+        guard let data = storage.data(forKey: favoritesKey),
+              let decoded = try? JSONDecoder().decode([Book].self, from: data) else {
+            return []
+        }
+        return decoded
+    }
+    
+    private func persistFavorites() {
+        guard let data = try? JSONEncoder().encode(favoriteBooks) else { return }
+        storage.set(data, forKey: favoritesKey)
+    }
 }

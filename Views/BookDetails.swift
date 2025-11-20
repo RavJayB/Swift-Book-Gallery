@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BookDetails: View {
     let book: Book
-    @AppStorage(AppStorageKeys.favoriteBooks) private var favoriteBooksData: Data = Data()
+    @Environment(BooksViewModel.self) private var viewModel
     @State private var isFavorite = false
     
     var body: some View {
@@ -95,40 +95,20 @@ struct BookDetails: View {
             }
         }
         .onAppear {
-            isFavorite = isBookFavorite()
+            viewModel.refreshFavorites()
+            isFavorite = viewModel.isFavorite(book)
         }
     }
     
     private func toggleFavorite() {
-        var favorites = loadFavorites()
-        if isBookFavorite() {
-            favorites.removeAll { $0.title == book.title }
-            isFavorite = false
-        } else {
-            favorites.append(book)
-            isFavorite = true
-        }
-        saveFavorites(favorites)
-    }
-    
-    private func loadFavorites() -> [Book] {
-        guard let favorites = try? JSONDecoder().decode([Book].self, from: favoriteBooksData) else {
-            return []
-        }
-        return favorites
-    }
-    
-    private func saveFavorites(_ favorites: [Book]) {
-        favoriteBooksData = (try? JSONEncoder().encode(favorites)) ?? Data()
-    }
-    
-    private func isBookFavorite() -> Bool {
-        loadFavorites().contains { $0.title == book.title }
+        viewModel.toggleFavorite(book)
+        isFavorite = viewModel.isFavorite(book)
     }
 }
 
 #Preview {
     NavigationStack {
         BookDetails(book: .sampleBook)
+            .environment(BooksViewModel())
     }
 }

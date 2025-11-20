@@ -47,6 +47,7 @@ struct ContentView: View {
                 Label("Favorites", systemImage: "bookmark.fill")
             }
         }
+        .environment(viewModel)
     }
         
 }
